@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Dashboard</title>
+<title>Admin Dashboard</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!--<link rel="stylesheet" href="/css/Dashboard_CSS/bootstrap.min.css" />-->
@@ -147,6 +147,7 @@
                         },
                         success: function(data){
                         let confirm = data;
+                        $("#error").html("");
                         $('#success').html(confirm);
                         //alert(confirm);
                         },
@@ -154,7 +155,7 @@
                         {
                                //alert("asdasd" + error);
                                //console.log("heyuuuuu" + jqXHR.responseText);
-
+                               $('#success').html("");
                                let err = jqXHR.responseText;
                                $("#error").html(err);
                                 //console.log(jqXHR);

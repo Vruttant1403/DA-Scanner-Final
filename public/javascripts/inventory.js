@@ -10,7 +10,24 @@ window.addEventListener('load',(event)=>{
     document.getElementById('rpr2').hidden=true;
     document.getElementById('defects1').required=false;
     document.getElementById('repair1').required=false;
+    
   });
+    document.getElementById('qty1').addEventListener("change",qtyCheck);
+
+    function validateForm(){
+      document.getElementById('qty1').value;
+      if(value<1)
+      {
+        alert("Value cant be Negative or 0");
+      }
+    }
+    function qtyCheck(){
+      document.getElementById('qty1').value;
+      if(value<1)
+      {
+        alert("Value cant be Negative or 0");
+      }
+    }
   function submitFn(){
     if(document.getElementById('rqty1').checked){
         let box = document.getElementById('qty1');

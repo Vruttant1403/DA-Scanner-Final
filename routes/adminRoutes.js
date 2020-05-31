@@ -14,21 +14,42 @@ const userRouter = express.Router();
 
 var loggedin = function (req,res,next)
 {
-	if(req.isAuthenticated()){
-		next() // if logged in
-	}
-	else if(req.cookies['remember_me']){
-		console.log(req.cookies['remember_me']);
-		req.user = req.cookies['remember_me'];
-		next();
-	}
-	else{
-		//console.log("looping....");
+    
+    if(req.cookies['remember_me']){
+        req.user = req.cookies['remember_me'];
+    }
+    if(req.isAuthenticated() || req.user)
+    {
+		
+        User.find({$and : [{_id : req.user._id},{enabled:true}]},function(err,rows){
+            if(err)
+            {
+                res.redirect('/');
+            }
+            else{
+                if(rows.length==0){
+                    //console.log("Enabled false");
+                    req.flash('message','Invalid User (You are disabled or not logged IN)');
+                    res.redirect('/');
+                }
+                else if(rows[0].userTypeId==1)
+                {
+					//console.log("correct");
+                    next() // if logged in
+                }
+                else{
+                    //console.log("Invalid");
+                    req.flash('message','Invalid User (You are disabled or not logged IN');
+                    res.redirect('/');
+                }
+            }
+        })  
+    }
+	else
 		res.redirect('/');
-	}
 }
 
-
+// ADD A COURSE TO THE DATABASE
 userRouter.post("/addCourse",(req,res) =>{
 
 	let cid = req.body.courseID;
@@ -105,13 +126,13 @@ userRouter.get("/",loggedin,(req,res)=>{
 })
 
 
-// ADD A COURSE TO THE DATABASE
+
 
 
 // LOADING GENERATE REPORT FORM
 
 
-userRouter.post("/generateReport",(request,response)=>{
+userRouter.post("/generateReport",loggedin,(request,response)=>{
    
 	let option=request.body.empType;
 	console.log(option);
@@ -121,8 +142,8 @@ userRouter.post("/generateReport",(request,response)=>{
 
 });
 
-
-userRouter.get("/addEmpUser", (request, response, next) =>
+//ADD Employee User Load
+userRouter.get("/addEmpUser",loggedin, (request, response, next) =>
 {
 	
 	UserTypes.find({}, (error, userTypes)=>
@@ -149,8 +170,8 @@ userRouter.get("/addEmpUser", (request, response, next) =>
 
 
 
-
-userRouter.post("/addEmpUser", async (request, response, next) => 
+//ADD Employee User 
+userRouter.post("/addEmpUser",loggedin, async (request, response, next) => 
 {
 		User.findOne({userEmailId:request.body.userEmailId},async (err,doc)=>{
 		if(err){
@@ -202,7 +223,7 @@ userRouter.post("/addEmpUser", async (request, response, next) =>
 });
 
 // DISPLAY STUDENTS INFO
-userRouter.get("/loadAllStudents",(req,res)=>{
+userRouter.get("/loadAllStudents",loggedin,(req,res)=>{
 	User.find({userTypeId: {$eq:5}}, (error, students)=>
 	{
 		if(error)
@@ -223,7 +244,7 @@ userRouter.get("/loadAllStudents",(req,res)=>{
 })
 
 // RESET STUDENT'S QR COUNT
-userRouter.post("/resetStudent/:stuid",(req,res)=>{
+userRouter.post("/resetStudent/:stuid",loggedin,(req,res)=>{
 
 	let id = req.params.stuid;
 	let id1=id;
@@ -239,7 +260,7 @@ userRouter.post("/resetStudent/:stuid",(req,res)=>{
 
 					if(flag)
 					{
-						res.send("QR RESET DONE");
+						res.send("QR RESET DONE. QR Sent to student's Email.");
 					}
 					else{
 						res.status(500).send("ERROR RESETTING QR");
@@ -253,8 +274,8 @@ userRouter.post("/resetStudent/:stuid",(req,res)=>{
 
 
 
-
-userRouter.get("/loadAllEmpUsers", (request, response, next) =>
+// Display all employees
+userRouter.get("/loadAllEmpUsers",loggedin, (request, response, next) =>
 {
 	User.find({userTypeId: {$ne:5}}, (error, emps)=>
 	{
@@ -325,3 +346,4 @@ userRouter.delete("/delEmp/:userId", (request, response, next)=>
 	});
 });
 module.exports = userRouter;
+

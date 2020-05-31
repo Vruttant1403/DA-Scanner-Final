@@ -7,6 +7,7 @@
             <style>
             
             </style>
+            <title>Inventory Management DA-Scanner</title>
         </head>
         <body>
             
@@ -20,7 +21,7 @@
           <div class="row">
               <div class="col-md-6">
 
-                <div class="table-responsive">
+                <div class="table-responsive" style="overflow: auto;">
                     <table class="table" style="font-size: medium;">
                         <thead style="background-color: #20232e;color: white;">
                             <th>Equipment Name</th>
@@ -69,7 +70,7 @@
                     <tr></tr>
                     <tr>
                         <td><label class="qty" style="color: #0060b4;">Quantity: </label></td>
-                        <td><input type="number" class="qty1" id="qty1" onkeyup="validateForm()" required name="totalQuantity"></td>
+                        <td><input type="number" class="qty1" id="qty1" onkeyup="validateForm()" required name="totalQuantity" min="1"></td>
                     </tr>
                         <tr> <td></td> <td><span id="error-qty" style="color: red" ></span></td></tr>
                     <tr></tr>

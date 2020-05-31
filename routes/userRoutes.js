@@ -88,8 +88,10 @@ userRouter.get("/loadHomePage",loggedin, (req,res)=>{
 
 // LOADING GENERATE REPORT FORM
 
+//TODO - IF STUDENT, CANT ACCESS REPORT
 userRouter.get("/loadGenerateReport",loggedin,(request, response)=>
 {
+
 	let user = request.user;
 	let route="";
 	if(user.userTypeId==1){
@@ -97,6 +99,7 @@ userRouter.get("/loadGenerateReport",loggedin,(request, response)=>
 	}
 	else if(user.userTypeId==2)
 	{
+		console.log("log");
 		route="gate";
 	}
 	else if(user.userTypeId==3)
@@ -354,12 +357,12 @@ userRouter.post('/registerStudent',(req,res)=>{
 					user.enabled = true;
 					user._id = ID;
 					let today = new Date().getFullYear();
-					console.log(user.batchYear + " " + today);
-					if(parseInt(user.batchYear) < today)
+					console.log(year + " " + today);
+					if(parseInt(user.batchYear) < today || year > today)
 					{
 						res.render("studentRegistration",{
 							data:req.body,
-							error:"You are an alumni, you can't register"
+							error:"You are an alumni, or ID year is invalid"
 						})
 						return;
 					}
@@ -415,67 +418,3 @@ userRouter.post('/registerStudent',(req,res)=>{
 
 module.exports = userRouter;
 
-/*
-[
-	check("userId","this userId is already exist").trim()
-	.custom((value,request) =>
-	{
-		User.findById(value)
-		.then(user =>
-		{
-			if(user)
-			{
-				throw new Error();
-			}
-			else
-			{
-				return true;
-			}
-		})
-		.catch(err =>
-		{
-			console.log("error occured while findById in User");
-			console.log(err);
-		})
-	})
-	,
-	check("userEmailId", "Enter valid email address").trim().isEmail(),
-	check("userEmailId", "this email is already exist").trim().isEmail().custom((value) =>
-	{
-		User.find({userEmailId: value})
-		.then(user =>
-		{
-			console.log(user);
-			if(user)
-			{
-				throw new Error();
-			}
-			else
-			{
-				return true;
-			}
-		})
-		.catch(err=>
-		{
-			console.log("error occured while find in User");
-			console.log(err);
-		})
-	})
-	,
-	check("password", "Enter valid password").trim().isLength({min: 8}),
-	check("passwordAgain").custom((value,request)=>
-	{
-		//console.log(request.req.body.password);
-		if(value != request.req.body.password)
-		{
-			//console.log(value);
-			throw new Error("password does not match");
-		}
-		else
-		{
-			return true;
-		}
-	})
-]
-,
-*/

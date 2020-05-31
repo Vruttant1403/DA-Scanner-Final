@@ -3,17 +3,12 @@ const path = require("path");
 const bodyParser = require("body-parser");
 //const cors = require("cors");
 const mongoose = require("mongoose"); // assign mongoose variable
-
 const session = require('express-session');
 const passport = require('passport');
-//require('./passport-config')(passport);
-
 const cookieParser = require('cookie-parser');
 const flash = require("connect-flash");
-
-
-// import diff Routes
-//const gateRoute = require("./routes/GateRoutes");
+const crypto = require('crypto');
+const time1 = require('./timer');
 require('dotenv').config();
 
 
@@ -111,7 +106,7 @@ app.use(function(req, res, next){
 
 app.get("/",(request, response) =>
 {
-
+    time1.f2();
     let cookie = request.cookies['remember_me'];
     console.log(cookie);
     let msg= request.flash('message')
@@ -124,7 +119,7 @@ app.get("/",(request, response) =>
 
     }else{
     //response.redirect("/admin/loadAddUser");
-    console.log(msg + "heyyyyy1");
+    //console.log(msg + "heyyyyy1");
 	response.render("loginPage",
 	{
         title: "Helloo, Welcome to DA-Scanner.",
@@ -158,6 +153,9 @@ app.get("/index",(request, response) =>
 
 
 
+
+
+
     /*let doc;
     if(request.session.userData)
         doc = request.session.userData;
@@ -182,6 +180,17 @@ app.post("/decryptID",(req,res) => {
 
     res.send(mystr);
 })
+app.get("/decryptID/:id",(req,res) => {
+
+    let id = req.params.id;
+    console.log(id);
+    var mykey = crypto.createDecipher('aes-128-cbc', 'dascanner');
+    var mystr = mykey.update(id, 'hex', 'utf8')
+    mystr += mykey.final('utf8');
+
+    res.send(mystr);
+})
+
 
 // set /gate routes gateRoutes
 //app.use("/gate", gateRoute);
@@ -191,6 +200,7 @@ app.use("/home",homeRoute);
 app.use("/gate",gateRoute);
 app.use("/admin",adminRoute);
 app.use('/lib_tmp',lib_tmp);
+
 
 app.use('/equipment',equipment);
 
@@ -206,6 +216,7 @@ app.use(function(req, res, next) {
     err.status = 404;
     next(err);
 });
+/*
 app.use(function(err,req,res,text){
 
     res.status(err.status || 500);
@@ -214,10 +225,12 @@ app.use(function(err,req,res,text){
     }else
     res.render("Errors/error500");
 
-})
+})*/
 
 
 app.listen(3000, ()=>
 {
 	console.log("DAScanner's Server started at port 3000");
 });
+
+

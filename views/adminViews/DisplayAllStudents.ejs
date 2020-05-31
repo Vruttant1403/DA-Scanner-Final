@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Admin Dashboard</title>
+<title>Student Details</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!--<link rel="stylesheet" href="/css/Dashboard_CSS/bootstrap.min.css" />-->
@@ -10,8 +10,11 @@
 
 <style>
 #StuTable_filter input{
-	margin-right:50px;
-}    
+	margin-right:130px;
+} 
+#StuTable_paginate{
+	margin-right:130px;
+}   
 </style>
 
 </head>
@@ -24,7 +27,7 @@
                 <h2 style="color: black"><%=title%></h2>
                 
 		</div>
-		<table class="table table-bordered" id="StuTable" style="width:80%">
+		<table class="table table-bordered" id="StuTable" style="width:90%; float:left;">
 			<thead class="thead-dark">
 					<tr>
 							<th >Student ID</th>
@@ -81,7 +84,9 @@
 
 <script>
 $(document).ready( function () {
-    $('#StuTable').DataTable();
+    $('#StuTable').DataTable({
+        "scrollX": true
+    });
 } );
 
 function resetStudent(id)

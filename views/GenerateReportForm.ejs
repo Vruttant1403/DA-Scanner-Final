@@ -99,7 +99,8 @@
             </div>
         </div>
     </div>
-    <%-include('footer')%>
+    <%if (id!=1) {%>
+        <%-include('footer')%> <%}%>
     <script src="/js/Report_JS/jquery.min.js"></script>
     <script src="/js/Report_JS/select2.min.js"></script>
     <script src="/js/Report_JS/moment.min.js"></script>
@@ -107,6 +108,7 @@
     <script src="/js/Report_JS/ReportValidation.js"></script>
     <script src="/js/Report_JS/global.js"></script>
     <script type="text/javascript">
+    $(document).ready( function () {
         var today = new Date();
         var dd = today.getDate();
         var mm = today.getMonth()+1; //January is 0!
@@ -117,9 +119,10 @@
             if(mm<10){
                 mm='0'+mm
             } 
-        today = dd+'-'+mm+'-'+yyyy;
-        document.getElementById("endDate").setAttribute("max", today);
-        document.getElementById("startDate").setAttribute("max", today);
+        today = yyyy+'-'+mm+'-'+dd;
+        document.getElementById("edate").setAttribute("max", today);
+        document.getElementById("sdate").setAttribute("max", today);
+    });
     </script>
 </body>
 </html>

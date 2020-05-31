@@ -66,6 +66,8 @@ let userSchema = new mongoose.Schema(
 	});
   };
 
+
+
 /*userSchema.methods.comparePassword = (password,hash)=>
 {
 	console.log("hey comparing " + password + " " + hash);

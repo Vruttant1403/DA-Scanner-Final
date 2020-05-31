@@ -7,9 +7,11 @@ var mail_equ=require('../model/mail_equipment');
 var user=require('../model/User');
 const date = require('date-and-time');
 
+
+
+
 //This function checks 
-//whether authenticated student
-// is logged in or not 
+//whether authenticated user  is logged in or not 
 var loggedin1 = function (req,res,next)
 {
     if(req.cookies['remember_me']){
@@ -20,7 +22,7 @@ var loggedin1 = function (req,res,next)
         user.find({_id : req.user._id},function(err,rows){
             if(err)
             {
-                res.redirect('/index');
+                res.redirect('/');
             }
             else{
                 if(rows[0].userTypeId==5)
@@ -28,14 +30,14 @@ var loggedin1 = function (req,res,next)
                     next() // if logged in
                 }
                 else{
-                    res.redirect('/index');
+                    res.redirect('/');
                 }
             }
         })
        
     }
 	else
-		res.redirect('/index');
+		res.redirect('/');
 }
 
 
@@ -77,9 +79,47 @@ var loggedin = function (req,res,next)
 		res.redirect('/');
 }
 
-router.get("/",loggedin,(req,res)=>{
+// Check logged in for report
+var loggedinReport = function (req,res,next)
+{
+    if(req.cookies['remember_me']){
+        req.user = req.cookies['remember_me'];
+    }
+    if(req.isAuthenticated())
+    {
+       
+        user.find({_id : req.user._id},function(err,rows){
+            if(err)
+            {
+                res.redirect('/');
+            }
+            else{
+                if(rows.length==0){
+                    //console.log("Enabled false");
+                    req.flash('message','Invalid User (You are disabled or not logged IN)');
+                    res.redirect('/');
+                }
+                else if(rows[0].userTypeId==3 || rows[0].userTypeId ==1)
+                {
+					//console.log("correct");
+                    next() // if logged in
+                }
+                else{
+                    //console.log("Invalid");
+                    req.flash('message','Invalid User (You are disabled or not logged IN');
+                    res.redirect('/');
+                }
+            }
+        })
+       
+    }   
+	else
+		res.redirect('/');
+}
 
-    
+
+// LOAD SAC HOME PAGE
+router.get("/",loggedin,(req,res)=>{    
 inventory.find(function (err, inventoryrecord) {
     if (err) {
         res.send(err);
@@ -103,7 +143,7 @@ router.get("/inventory",loggedin,function(req,res,next){
     });
 });
 
-
+// Adding stock to inventory
 router.post("/inventory",loggedin,function(req,res,next){
    
     //add new stock
@@ -170,15 +210,9 @@ router.post("/inventory/updatestock",loggedin,function(req,res,next){
 
 
 
-
-
-
-
-
-
 //this router will be used for fetching paricular student's equipment borrower history
 router.get('/borrow_history',loggedin1,function(req,res,next){
-    let stu_id=req.user._id.toString();
+    let stu_id=req.user._id;
     console.log(req.user._id);
     console.log(stu_id);
     sacrecords.aggregate([
@@ -219,12 +253,14 @@ router.get('/borrow_history',loggedin1,function(req,res,next){
                  else{
 
 
-                    console.log(rows2);
+                    console.log(rows2 + " HEY");
                      //res.json(rows2);
-                     res.render('student_views/student_borrower_history',{
-                        sac_records:rows1,
-                        pending_records:rows2
-                    })
+                     
+                        res.render('student_views/student_borrower_history',{
+                            sac_records:rows1,
+                            pending_records:rows2
+                        
+                     })
                     
                  }
              })
@@ -378,7 +414,7 @@ router.post("/return/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
 });
 
 
-router.post("/generateReport",(request, response)=>
+router.post("/generateReport",loggedinReport,(request, response)=>
 {
 	console.log("you are in gate router");
 	let option = request.body.reportOption;
@@ -573,11 +609,13 @@ router.post("/generateReport",(request, response)=>
                 setTimeout(()=>{
                     response.render("reportViews/DisplaySACReport",
                     {
-                        title: "Generated Report From SAC Reocrds",
+                        title: "Generated Report From SAC Records",
                         sac_records: sac_records,
                         temp_records: result,
-                        startDate: startDate,
-                        endDate: endDate
+                        startDate: startDate=='01-01-2000' ? 0 : startDate,
+                        endDate: endDate,
+                        id: endId,
+
                     });
 
                 },1000);
@@ -589,11 +627,12 @@ router.post("/generateReport",(request, response)=>
                 setTimeout(()=>{
                     response.render("reportViews/DisplaySACReport",
                     {
-                        title: "Generated Report From SAC Reocrds",
+                        title: "Generated Report From SAC Records",
                         sac_records: sac_records,
                         temp_records: result,
-                        startDate: startDate,
-                        endDate: endDate
+                        startDate: startDate=='01-01-2000' ? 0 : startDate,
+                        endDate: endDate,
+                        id: endId
                     });
 
                 },500);
@@ -605,6 +644,63 @@ router.post("/generateReport",(request, response)=>
 	//request.app.handle(request,response);
 	
 });
+
+
+router.get("/issuedEquipments",loggedin,(req,res)=>{
+    equipment.aggregate(([
+        {
+            //JOINING INVENTORY TABLE   
+               "$lookup":
+               {
+                   "from": "inventory_records",
+                   "localField": "equipment_id",
+                   "foreignField": "_id",
+                   "as": "inventory_records"
+               }
+           },
+           {
+               "$unwind": "$inventory_records"
+           }
+    ])).exec((err,doc)=>{
+        if(err)
+        {
+            res.status(500).send(err);
+        }
+        else{
+            let equips=[];
+            if(doc){
+                
+              
+                for(d of doc){
+               
+                    let x = d.issue_date;
+                    x = x.split('-');
+                    let dat_obj = new Date(x[2],x[1]-1,x[0]);
+                    dat_obj=new Date(dat_obj.getFullYear(),dat_obj.getMonth(),dat_obj.getDate()+7);
+                    let return_date=date.format(dat_obj,"DD-MM-YYYY");
+                    console.log(return_date);
+                    d.return_date=return_date;
+                    equips.push(d);
+                }
+                setTimeout(()=>{
+                    console.log("hey");
+                    res.render("equipment_views/issuedEquipments",{
+                        data: equips,
+                        msg: ""
+                    })
+                },1000);
+            }
+            else{
+                setTimeout(()=>{
+                    res.render("equipment_views/issuedEquipments",{
+                        data: equips,
+                        msg: "No Equipments Borrowed"
+                    })
+                },1000);
+            }
+        }
+    })
+})
  module.exports = router;
 
 

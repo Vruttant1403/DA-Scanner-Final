@@ -10,6 +10,44 @@ const date = require('date-and-time'); //formate date and time
 
 const gateRouter = express.Router();
 
+var loggedinReport = function (req,res,next)
+{
+    if(req.cookies['remember_me']){
+        req.user = req.cookies['remember_me'];
+    }
+    if(req.isAuthenticated())
+    {
+       
+        User.find({_id : req.user._id},function(err,rows){
+            if(err)
+            {
+				console.log(err);
+                res.redirect('/');
+            }
+            else{
+                if(rows.length==0){
+                    //console.log("Enabled false");
+                    req.flash('message','Invalid User (You are disabled or not logged IN)');
+                    res.redirect('/');
+                }
+                else if(rows[0].userTypeId==2 || rows[0].userTypeId == 1)
+                {
+					//console.log("correct");
+                    next() // if logged in
+                }
+                else{
+                    //console.log("Invalid");
+                    req.flash('message','Invalid User (You are disabled or not logged IN');
+                    res.redirect('/');
+                }
+            }
+        })
+       
+    }   
+	else
+		res.redirect('/');
+}
+
 var loggedin = function (req,res,next)
 {
     
@@ -65,8 +103,29 @@ gateRouter.post("/checkQR",loggedin,(request, response, next) =>
 		try
 		{
 			mykey = crypto.createDecipher('aes-128-cbc', 'dascanner');
-			var userId = mykey.update(id, 'hex', 'utf8')
+			 userId = mykey.update(id, 'hex', 'utf8')
 			userId += mykey.final('utf8');
+			User.find({qr_code:userId},(err, user)=>
+			{
+				if(err)
+				{
+				console.log("error while fetching user in CheckQR: ");
+				console.log(err);
+				return response.send("ERROR");
+				}
+				console.log(userId);
+		
+				if(user[0])
+				{
+					console.log(user);
+					response.send(user);
+				}
+				else
+				{
+					
+				response.send("INVALID");
+				}
+	});
 		}
 		catch(err)
 		{
@@ -74,10 +133,10 @@ gateRouter.post("/checkQR",loggedin,(request, response, next) =>
 			return response.send("INVALID");
 		}
 	}
-	
+	else{
 	console.log(request.body.mes);
 	console.log("\nid: "+userId);
-	User.findById(userId,{password:0},(err, user)=>
+	User.find({$and: [{_id:userId},{userTypeId:5}]},(err, user)=>
 	{
 		if(err)
 		{
@@ -87,15 +146,18 @@ gateRouter.post("/checkQR",loggedin,(request, response, next) =>
 		}
 		console.log(userId);
 		//console.log(user);
-		if(user)
+		if(user[0])
 		{
+			console.log(user);
 			response.send(user);
 		}
 		else
 		{
+			console.log("heyRoute");
 			response.send("INVALID");
 		}
 	});
+	}
 });
 
 gateRouter.post("/insertRecord",loggedin,(request, response, next) =>
@@ -146,7 +208,7 @@ gateRouter.post("/insertRecord",loggedin,(request, response, next) =>
 						console.log(err);
 					}
 
-					if(!(tempRecord[0] == undefined))
+					if(!(tempRecord[0] == undefined)) //IN ENTRY IS THERE
 					{
 						forgotIn = false;
 						gateRecord.inDate = tempRecord[0].inDate;
@@ -268,7 +330,7 @@ gateRouter.get("/loadGenerateReport",loggedin,(request, response)=>
 	});
 });
 
-gateRouter.post("/generateReport",(request, response)=>
+gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 {
 	console.log("you are in gate router");
 	let option = request.body.reportOption;
@@ -432,14 +494,18 @@ gateRouter.post("/generateReport",(request, response)=>
 				console.log(gateRec);
 				console.log("hEYYYYYoooo");
 				console.log(result);
-				response.render("reportViews/DisplayReport",
-				{
-					title: "Generated Report From Gate Reocrds",
-					tempRec: result,
-					gateRec: gateRec,
-					startDate: startDate,
-					endDate: endDate
-				});
+				
+				setTimeout(()=>{
+					response.render("reportViews/DisplayReport",
+					{
+						title: "Generated Report From Gate Records",
+						tempRec: result,
+						gateRec: gateRec,
+						startDate: startDate=='01-01-2000' ? 0 : startDate,
+						endDate: endDate,
+						id:endId
+					});
+				},1000);
 				
 			}
 			else
@@ -447,14 +513,17 @@ gateRouter.post("/generateReport",(request, response)=>
 				console.log(gateRec);
 				console.log("hEYYYYY");
 				console.log(tempRec);
-				response.render("reportViews/DisplayReport",
-				{
-					title: "Generated Report From Gate Reocrds",
-					tempRec: undefined,
-					gateRec: gateRec,
-					startDate: startDate,
-					endDate: endDate
-				});
+				setTimeout(()=>{
+					response.render("reportViews/DisplayReport",
+					{
+						title: "Generated Report From Gate Records",
+						tempRec: undefined,
+						gateRec: gateRec,
+						startDate: startDate=='01-01-2000' ? 0 : startDate,
+						endDate: endDate,
+						id:endId
+					});
+				},1000);
 				//tempRec=undefined;
 			}
 		});

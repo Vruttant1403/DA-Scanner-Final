@@ -57,6 +57,10 @@
     font-family: inherit;
     font-size: 15px;
     line-height: inherit;
+    
+    }
+    button{
+      background-color: black !important;
     }
   </style>
   <script src= "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"> </script> 
@@ -83,8 +87,8 @@
 
 
       <div id="buttonDiv">
-        <a><button class="button dablue" id="startButton"> Start </button> </a>
-        <a> <button class="button dablue"  id="resetButton"> Reset </button></a>
+        <a><button class="button" id="startButton"> Start </button> </a>
+        <a> <button class="button"  id="resetButton"> Reset </button></a>
       </div>
 
       <div>
@@ -101,9 +105,9 @@
       <div id="result">
       </div>
       <br>
-      <button id="verify" class="dablue">Verify</button>
-      <button id="btnIn" class="dablue" disabled>Entry</button>
-      <button id="btnOut" class="dablue" disabled>Exit</button>
+      <button id="verify" >Verify</button>
+      <button id="btnIn"  disabled>Entry</button>
+      <button id="btnOut" disabled>Exit</button>
 
       <div id="sourceSelectPanel" style="display:none">
         <label for="sourceSelect">Change video source:</label>
@@ -151,12 +155,12 @@
         else
         {
           $('#result').html(
-            "ID:&emsp;" + data._id + "<br>" +
-            "FullName:&emsp;" + data.fName + " " + data.lName + "<br>" + 
-            "Course:&emsp;" + data.courseName + "<br>" +
-            "batch:&emsp;" + data.batchYear
+            "ID:&emsp;" + data[0]._id + "<br>" +
+            "FullName:&emsp;" + data[0].fName + " " + data[0].lName + "<br>" + 
+            "Course:&emsp;" + data[0].courseName + "<br>" +
+            "batch:&emsp;" + data[0].batchYear
           );
-          document.getElementById("studentId").value = data._id;
+          document.getElementById("studentId").value = data[0]._id;
           $('#btnIn').prop('disabled', false);
           $('#btnOut').prop('disabled', false);
         }
