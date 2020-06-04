@@ -118,12 +118,13 @@ app.get("/",(request, response) =>
         response.redirect('/users/loadHomePage');
 
     }else{
-    //response.redirect("/admin/loadAddUser");
+    //response.redirect("/admin/addEmpUser");
     //console.log(msg + "heyyyyy1");
 	response.render("loginPage",
 	{
         title: "Helloo, Welcome to DA-Scanner.",
-        error: msg
+        error: msg,
+        info: ""
     });
 }
 });
@@ -211,11 +212,11 @@ app.use("/qrcode",qrcode);
 //app.user("/emp",userRoute);
 // init port so server can start listening
 
-app.use(function(req, res, next) {
+/*app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
-});
+});*/
 /*
 app.use(function(err,req,res,text){
 

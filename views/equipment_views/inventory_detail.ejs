@@ -120,7 +120,7 @@
                                         <br>
                                         <span style="color: red; font-size: 15px;" >(quantity will be added in current quantity)</span>
                                     </td>
-                                    <td><input type="number" class="qty1" id="qty1" name="quantity"></td>
+                                    <td><input type="number" class="qty1" id="qty1" name="quantity" onkeyup="validateUpdateForm()" min='1'></td>
                                 </tbody>   
                                 </tr>
                             <tr></tr>
@@ -131,7 +131,7 @@
                                     <br>
                                     <span style="color: red; font-size: 15px;" >(Defects will be added in current quantity)</span>
                                 </td>
-                                <td><input type="number" class="qty1" id="defects1" name="Defects"></td>
+                                <td><input type="number" class="qty1" id="defects1" name="Defects" onkeyup="validateUpdateForm()" min='1'></td>
                                 </tbody>
                             </tr>
                         <tr></tr>
@@ -141,10 +141,9 @@
                                     <br>
                                     <span style="color: red; font-size: 15px;" >(Repair will be added in current quantity)</span>
                                 </td>
-                                <td><input type="number" class="rpr1" id="repair1" name="Repair"></td>
+                                <td><input type="number" class="rpr1" id="repair1" name="Repair" onkeyup="validateUpdateForm()" min='1'></td>
                             </tbody>
                             <tbody id="rpr3">
-                                
                                 <td colspan="2"><span style="color:red;font-size: 15px;"> No Defects </span></td>
                             </tbody>
                             
@@ -177,18 +176,20 @@
                 document.getElementById('rpr3').hidden=true;
                 function v1()
                 {
+                    let defect = document.getElementById('rrpr1');
                     let x=document.getElementById('sel1');
                     
                     var y=x.options[x.selectedIndex].getAttribute('data-dft');
       
                       Defected_Items=Number(y);
-                      if(Defected_Items==0)
+                      if(Defected_Items==0 && defect.checked)
                       {
                           document.getElementById('rpr2').hidden=true;
                           document.getElementById('rpr3').hidden=false;
                       }
-                      else
+                      else if(Defected_Items>0 && defect.checked)
                       {
+                          //alert("here");
                         document.getElementById('rpr2').hidden=false;
                           document.getElementById('rpr3').hidden=true;
                       }

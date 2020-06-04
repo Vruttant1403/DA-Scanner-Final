@@ -252,7 +252,13 @@ router.get('/borrow_history',loggedin1,function(req,res,next){
                  }
                  else{
 
-
+                    for(var i=0;i<rows2.length;i++){
+                        rows2[i].issue_date = rows2[i].issue_date.toDateString();
+                    }
+                    for(var i=0;i<rows1.length;i++){
+                        rows1[i].issue_date = rows1[i].issue_date.toDateString();
+                        rows1[i].return_date = rows1[i].return_date.toDateString();
+                    }
                     console.log(rows2 + " HEY");
                      //res.json(rows2);
                      
@@ -297,7 +303,7 @@ router.post("/issue/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
                 const equi = new equipment({
                     equipment_id: req.params.equipmentID,
                     student_id: req.params.studentID,
-                    issue_date: date.format(x, 'DD-MM-YYYY'),
+                    issue_date: date.format(x, 'YYYY-MM-DD'),
                     quantity: req.params.quantity
 
 
@@ -340,9 +346,10 @@ router.post("/return/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
                 let issued_date = rows[0].issue_date;
                 issued_date = new Date(issued_date);
                 let today = new Date();
-                issued_date = date.format(issued_date,"DD-MM-YYYY");
-                today = date.format(today,"DD-MM-YYYY");
-                let diff= today - issued_date;
+               // issued_date = issued_date;
+                //today = date.format(today,"");
+                let diff= today.getTime() - issued_date.getTime();
+                 diff = diff/(1000*3600*24);
                 if(diff> 7 )
                 {
                     l_amount = diff * 5 * req.params.quantity;
@@ -350,9 +357,9 @@ router.post("/return/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
                 const sac1 = new sacrecords({
                     equipment_id: rows[0].equipment_id,
                     student_id: rows[0].student_id,
-                    issue_date: rows[0].issue_date,
+                    issue_date: issued_date,
                     quantity:req.params.quantity,
-                    return_date: today,
+                    return_date: date.format(today,"YYYY-MM-DD"),
                     loan: l_amount
 
 
@@ -425,8 +432,8 @@ router.post("/generateReport",loggedinReport,(request, response)=>
 
     today = new Date();
     let fdate  = new Date("2000-01-01");
-	let startDate = date.format(fdate, 'DD-MM-YYYY');
-	let endDate = date.format(today, 'DD-MM-YYYY');
+	let startDate =fdate;
+	let endDate = today;
 	console.log(today);
 	let startId = "200100000";
 	let endId = "999999999";
@@ -439,11 +446,11 @@ router.post("/generateReport",loggedinReport,(request, response)=>
 
 	if(option != 2)
 	{
-		let sdate  = new Date(request.body.startDate);
-		let edate  = new Date(request.body.endDate);
+		 startDate  = new Date(request.body.startDate);
+		endDate  = new Date(request.body.endDate);
 
-		startDate = date.format(sdate, 'DD-MM-YYYY');
-		endDate = date.format(edate, 'DD-MM-YYYY');
+		//startDate = date.format(sdate, 'DD-MM-YYYY');
+		//endDate = date.format(edate, 'DD-MM-YYYY');
 
 		if(startDate > endDate)
 		{
@@ -499,10 +506,10 @@ router.post("/generateReport",loggedinReport,(request, response)=>
 			[
 				{"$or":[{"return_date": {"$lte": endDate}},
 						//{"outDate": {"$lte": endDate}},
-						{"return_date":{"$eq": ""}}]},
-				{"$or":[{"issue_date": {"$gte": startDate}},
+						{"return_date":{"$gte": startDate}}]},
+				{"$and":[{"issue_date": {"$gte": startDate}},
 						//{"inDate": {"$gte": startDate}},
-						{"issue_date":{"$eq": ""}}]},
+						{"issue_date":{"$lte": endDate}}]},
 				{"student_id": {"$gte": startId}},
 				{"student_id": {"$lte": endId}}
 			]
@@ -527,7 +534,13 @@ router.post("/generateReport",loggedinReport,(request, response)=>
 				startDate: startDate,
 				endDate: endDate
             });*/
+            for(var i=0;i<result.length;i++){
+                
+                result[i].issue_date = result[i].issue_date.toDateString();
+                result[i].return_date =result[i].return_date.toDateString();
+            }
             sac_records=result;
+           
             console.log("HEYYYYYY");
             console.log(sac_records);
 		}
@@ -586,7 +599,7 @@ router.post("/generateReport",loggedinReport,(request, response)=>
             {
                 "$and":
                 [
-                    {"$or":[{"issue_date": {"$gte": startDate}},
+                    {"$and":[{"issue_date": {"$gte": startDate}},
                             //{"inDate": {"$gte": startDate}},
                             {"issue_date":{"$lte": endDate}}]},
                     {"student_id": {"$gte": startId}},
@@ -605,6 +618,9 @@ router.post("/generateReport",loggedinReport,(request, response)=>
            // console.log(startDate, endDate);
             if(result.length !== 0)
             {
+                for(var i=0;i<result.length;i++){
+                    result[i].issue_date=  result[i].issue_date.toDateString();
+                }
                 // WILL RENDER BEFORE ALL DATA IS GOT SO SET TIMEOUT
                 setTimeout(()=>{
                     response.render("reportViews/DisplaySACReport",
@@ -612,8 +628,8 @@ router.post("/generateReport",loggedinReport,(request, response)=>
                         title: "Generated Report From SAC Records",
                         sac_records: sac_records,
                         temp_records: result,
-                        startDate: startDate=='01-01-2000' ? 0 : startDate,
-                        endDate: endDate,
+                        startDate: startDate==fdate ? 0 : startDate.toDateString(),
+                        endDate: endDate.toDateString(),
                         id: endId,
 
                     });
@@ -630,8 +646,8 @@ router.post("/generateReport",loggedinReport,(request, response)=>
                         title: "Generated Report From SAC Records",
                         sac_records: sac_records,
                         temp_records: result,
-                        startDate: startDate=='01-01-2000' ? 0 : startDate,
-                        endDate: endDate,
+                        startDate: startDate==fdate ? 0 : startDate.toDateString(),
+                        endDate: endDate.toDateString(),
                         id: endId
                     });
 
@@ -672,14 +688,20 @@ router.get("/issuedEquipments",loggedin,(req,res)=>{
                 
               
                 for(d of doc){
-               
-                    let x = d.issue_date;
-                    x = x.split('-');
-                    let dat_obj = new Date(x[2],x[1]-1,x[0]);
-                    dat_obj=new Date(dat_obj.getFullYear(),dat_obj.getMonth(),dat_obj.getDate()+7);
-                    let return_date=date.format(dat_obj,"DD-MM-YYYY");
-                    console.log(return_date);
-                    d.return_date=return_date;
+                    
+                    let return_date = d.issue_date;
+                    let issue_date = d.issue_date.toDateString();
+                    console.log(return_date + " " + issue_date);
+                    //x = x.split('-');
+                    return_date.setDate(return_date.getDate() + 7);
+                    // let dat_obj = new Date(x[2],x[1]-1,x[0]);
+                    // dat_obj=new Date(dat_obj.getFullYear(),dat_obj.getMonth(),dat_obj.getDate()+7);
+                    // let return_date=date.format(dat_obj,"DD-MM-YYYY");
+                    // //d.issue_date = date.format(d.issue_date,"DD-MM-YYYY");
+                    console.log(return_date + " " + issue_date);
+                    d.issue_date = issue_date;
+                    d.return_date=return_date.toDateString();
+                   
                     equips.push(d);
                 }
                 setTimeout(()=>{

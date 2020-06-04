@@ -8,10 +8,43 @@
     <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
     <script type="text/javascript">
 
+var isValid=false;
+function getLocation(callback) {
+    if (navigator.geolocation) {
+    //alert("hey");
+     navigator.geolocation.getCurrentPosition((position)=>{
+
+      var pos ={
+        lat: position.coords.latitude,
+        lon: position.coords.longitude
+      }
+
+      return callback(pos);
+    });
+    //alert(a);
+    } else {
+    alert("Geolocation is not supported by this browser.");
+    isValid=true;
+    }
+
+  }
 
 function CheckQR(id,status)
     {
-    $.ajax(
+      getLocation(function(position){
+          //alert(position.lat + " --- " + position.lon);
+          //23.0079356 --- 72.5260686
+          let lat=position.lat;
+          let lon=position.lon;
+          //TODO CHANGE FOR LIB
+          if(lat>=23 && lat<=24 && lon >= 72 && lon<=73){
+            isValid=true;
+          }
+     
+     
+      if(isValid){
+      
+      $.ajax(
      {
          type:'post',
          url:'/scanqr/',
@@ -35,7 +68,12 @@ function CheckQR(id,status)
 
          
        });
-     }
+
+      }else{
+        alert("You are not in you office vicinity. You cannot process requests right now");
+      }
+    });
+  }
     
     
          

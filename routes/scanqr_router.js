@@ -4,22 +4,22 @@ var user_records=require('../model/User');
 
 router.post('/',function(req,res,next){
    
-    console.log("inside router");
+    //console.log("inside router");
     // IF QR IS SCANNED
     if(req.body.status==1)
     {
-        console.log("in QR");
+          //console.log("in QR");
           user_records.findOne({qr_code:req.body.id},function(err,rows){
             if(err)
             {
-               console.log(err);
+               //console.log(err);
                 res.status(500).send("Qr invalid") 
             }
             else{
                 //console.log(rows);
                 if(rows)
                 {
-                    console.log(rows + "heyyy");
+                   // console.log(rows + "heyyy");
                     let today = new Date();
                     let year = today.getFullYear();
                     if(year <= parseInt(rows.batchYear) && rows.enabled==true){

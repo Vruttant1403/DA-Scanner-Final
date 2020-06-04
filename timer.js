@@ -9,10 +9,11 @@ const date = require('date-and-time');
 
 var time={
      f2() {
+         console.log("intime");
                 //var window=global;
                  setInterval(function(){ // Set interval for checking
                     var date1 = new Date(); // Create a Date object to find out what time it is
-                    console.log(date1.getMinutes());
+                    //console.log(date1.getMinutes());
                     //console.log(global);
                     if(date1.getHours() === 02 && date1.getMinutes() === 00 ){ // Check the time
                         
@@ -89,7 +90,7 @@ var time={
                                                                 else
                                                                 {
                                                                     //res.json(result);
-                                                                    console.log(result);
+                                                                    console.log(result + "Heyyy");
                                                                 }
                                                             })
                                                         
@@ -129,7 +130,7 @@ var time={
 
                         
                     }
-                }, 2000);
+                }, 6000);
             }
     
 

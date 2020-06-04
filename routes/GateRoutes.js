@@ -178,7 +178,8 @@ gateRouter.post("/insertRecord",loggedin,(request, response, next) =>
 			console.log(user._id);
 
 			const now = new Date();
-			let currDate = date.format(now, 'DD-MM-YYYY');
+			let currDate = date.format(now, 'YYYY-MM-DD');
+			//let currDate = now;
 			let currTime = date.format(now, 'HH:mm:ss');
 
 			console.log(request.body.out);
@@ -341,8 +342,10 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 
     today = new Date();
     let fdate  = new Date("2000-01-01");
-	let startDate = date.format(fdate, 'DD-MM-YYYY');
-	let endDate = date.format(today, 'DD-MM-YYYY');
+	//let startDate = date.format(fdate, 'YYYY-MM-DD');
+	//let endDate = date.format(today, 'YYYY-MM-DD');
+	let startDate = fdate;
+	let endDate = today;
 	console.log(today);
 	let startId = "200100000";
 	let endId = "999999999";
@@ -352,21 +355,24 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 		startId = request.body.studentId;
 		endId = request.body.studentId;
 	}
-
+	let sdate=startDate;
+	let edate=endDate;
 	if(option != 2)
 	{
-		let sdate  = new Date(request.body.startDate);
-		let edate  = new Date(request.body.endDate);
-
-		startDate = date.format(sdate, 'DD-MM-YYYY');
-		endDate = date.format(edate, 'DD-MM-YYYY');
-
-		if(startDate > endDate)
+		 sdate  = new Date(request.body.startDate);
+		 edate  = new Date(request.body.endDate);
+		console.log(sdate + " " + edate);
+		
+		
+		if(sdate>edate)
 		{
-			let tempDate = startDate;
-			startDate = endDate;
-			endDate = tempDate;
+			let tempDate = sdate;
+			sdate = edate;
+			edate = tempDate;
+			console.log("hey");
 		}
+		startDate = sdate;
+		endDate = edate;
 	}
 
 	console.log(startDate + " "+ endDate);
@@ -402,10 +408,10 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 			[
 				{"$or":[{"outDate": {"$lte": endDate}},
 						//{"outDate": {"$lte": endDate}},
-						{"outDate":{"$eq": ""}}]},
-				{"$or":[{"inDate": {"$gte": startDate}},
+						{"outDate":{"$gte": startDate}}]},
+				{"$and":[{"inDate": {"$lte": endDate}},
 						//{"inDate": {"$gte": startDate}},
-						{"inDate":{"$eq": ""}}]},
+						{"inDate":{"$gte": startDate}}]},
 				{"userId": {"$gte": startId}},
 				{"userId": {"$lte": endId}}
 			]
@@ -429,7 +435,16 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 				startDate: startDate,
 				endDate: endDate
 			});*/
+			
+			console.log(result);
 			gateRec = result;
+			for(var i=0;i<gateRec.length;i++){
+                
+				gateRec[i].inDate = gateRec[i].inDate.toDateString();
+				gateRec[i].outDate= gateRec[i].outDate.toDateString();
+				
+			}
+			console.log(gateRec);
 		}
 		else
 		{
@@ -469,12 +484,12 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 			{
 				"$and":
 				[
-					{"$or":[{"outDate": {"$lte": endDate}},
+					{"$or":[{"outDate": {"$eq": null}},
 							//{"outDate": {"$lte": endDate}},
 							{"outDate":{"$eq": ""}}]},
-					{"$or":[{"inDate": {"$lte": endDate}},
+					{"$and":[{"inDate": {"$lte": endDate}},
 							//{"inDate": {"$gte": startDate}},
-							{"inDate":{"$eq": ""}}]},
+							{"inDate":{"$gte": startDate}}]},
 					{"userId": {"$gte": startId}},
 					{"userId": {"$lte": endId}}
 				]
@@ -494,15 +509,18 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 				console.log(gateRec);
 				console.log("hEYYYYYoooo");
 				console.log(result);
-				
+				for(var i=0;i<result.length;i++){
+                
+					result[i].inDate = result[i].inDate.toDateString();
+				}
 				setTimeout(()=>{
 					response.render("reportViews/DisplayReport",
 					{
 						title: "Generated Report From Gate Records",
 						tempRec: result,
 						gateRec: gateRec,
-						startDate: startDate=='01-01-2000' ? 0 : startDate,
-						endDate: endDate,
+						startDate: startDate==fdate ? 0 : startDate.toDateString(),
+						endDate: endDate.toDateString(),
 						id:endId
 					});
 				},1000);
@@ -519,8 +537,8 @@ gateRouter.post("/generateReport", loggedinReport,(request, response)=>
 						title: "Generated Report From Gate Records",
 						tempRec: undefined,
 						gateRec: gateRec,
-						startDate: startDate=='01-01-2000' ? 0 : startDate,
-						endDate: endDate,
+						startDate: startDate==fdate ? 0 : startDate.toDateString(),
+						endDate: endDate.toDateString(),
 						id:endId
 					});
 				},1000);

@@ -91,6 +91,43 @@ userRouter.post("/addCourse",(req,res) =>{
 
 
 })
+
+userRouter.post("/updateCourse",function(req,res){
+	let cid=req.body.id;
+	let course_name=req.body.coursename;
+	let course_duration=req.body.courseduration;
+
+
+	Course.updateOne({_id:cid},{$set:{
+		course_name:course_name,
+		duration:course_duration
+	}},function(err,result){
+
+		if(err){
+			res.status(500).send("Error updating course");
+		}
+		if(result){
+			res.send("Course Updated");
+		}
+		else{
+			res.send("Course not updated");
+		}
+	})
+
+	
+})
+
+userRouter.post('/deleteCourse',function(req,res){
+	Course.deleteOne({_id:req.body.id},function(err,rows){
+		if(err){
+			res.status(500).send("Error deleting course");
+		}
+		else{
+			res.send("Course deleted");
+		}
+	})
+})
+
 userRouter.get("/",loggedin,(req,res)=>{
 
 	let libRecords;
@@ -112,12 +149,23 @@ userRouter.get("/",loggedin,(req,res)=>{
         }
 	});
 	let user = req.user;
-	
+	let coursedata;
+	Course.find(function (err,rows){
+		if(err){
+			res.status(500).send(err);
+		}
+		else{
+			
+				coursedata=rows;
+			
+		}
+	})
 	setTimeout(()=>{
         res.render("adminViews/adminHome",{
 			title: user.fName + " " + user.lName,
 			avl_seats: libRecords,
 			inventoryData: inventoryRecords,
+			coursedata1:coursedata,
 			err: ""
 		})
     },500)

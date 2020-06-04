@@ -224,7 +224,7 @@ router.get('/:id?',loggedin,function(req,res,next){
                     in_time:new String(h+":"+m+":"+s),
                     out_time:null,
                     //date:new Date(dat_obj.getFullYear(),dat_obj.getMonth(),dat_obj.getDate())
-                    date: date.format(now, 'DD-MM-YYYY')
+                    date: date.format(now, 'YYYY-MM-DD')
                 
                 });
                
@@ -255,7 +255,7 @@ router.get('/:id?',loggedin,function(req,res,next){
             
                         const now = new Date();
                         let curtime=date.format(now,'HH:mm:ss')
-                        let currDate = date.format(now, 'DD-MM-YYYY');
+                        let currDate = date.format(now, 'YYYY-MM-DD');
                        
                         docs1[0].out_time=curtime;
                         docs1[0].date=currDate;
@@ -325,21 +325,31 @@ router.get('/:id?',loggedin,function(req,res,next){
     });
 }
 else{
-    tmp_lib.find(function(err,rows){
+    tmp_lib.find({}).lean().exec(function(err,rows){
         if(err)
         {
             res.json(err);
         }
         else{
-          
+            console.log(rows.length)
+            if(rows.length!=0){
+
+               for(let i=0;i<rows.length;i++){
+                   rows[i].date = rows[i].date.toDateString();
+               }
+            }
+            
+            console.log(rows);
             let avl_seats=200-rows.length;
            
             //res.json(x);
-            res.render('library_views/add_lib_tmp',{
-                avl_seats:avl_seats,
-                students:rows,
-                errors:null
-            })
+            
+                res.render('library_views/add_lib_tmp',{
+                    avl_seats:avl_seats,
+                    students:rows,
+                    errors:null
+                }) 
+        
         }
     })
 }
@@ -354,7 +364,7 @@ router.post('/',function(req,res,next){
     var h=d1.getHours();
     var m=d1.getMinutes();
     var s=d1.getSeconds();
-   
+   console.log("in temp");
     const tmp=new tmp_lib({
         userId : req.body.studentId,
         //in_time : dat_obj.getTime(),
@@ -430,8 +440,9 @@ router.post("/generateReport",loggedinReport,(request,response)=>{
 
     today = new Date();
     let fdate  = new Date("2000-01-01");
-	let startDate = date.format(fdate, 'DD-MM-YYYY');
-	let endDate = date.format(today, 'DD-MM-YYYY');
+	let startDate = fdate;
+    let endDate = today;
+    today = endDate;
 	console.log(today);
 	let startId = "200100000";
 	let endId = "999999999";
@@ -447,15 +458,18 @@ router.post("/generateReport",loggedinReport,(request,response)=>{
 		let sdate  = new Date(request.body.startDate);
 		let edate  = new Date(request.body.endDate);
 
-		startDate = date.format(sdate, 'DD-MM-YYYY');
-		endDate = date.format(edate, 'DD-MM-YYYY');
+		//startDate = date.format(sdate, 'DD-MM-YYYY');
+		//endDate = date.format(edate, 'DD-MM-YYYY');
 
-		if(startDate > endDate)
+		if(sdate > edate)
 		{
-			let tempDate = startDate;
-			startDate = endDate;
-			endDate = tempDate;
-		}
+			let tempDate = sdate;
+			sdate = edate;
+			edate = tempDate;
+        }
+        startDate=sdate;
+        endDate=edate;
+    
 	}
 
 	console.log(startDate + " "+ endDate);
@@ -518,7 +532,10 @@ router.post("/generateReport",loggedinReport,(request,response)=>{
 				startDate: startDate,
 				endDate: endDate
 			});*/
-			libRec = result;
+            libRec = result;
+            for(let i = 0;i<libRec.length;i++){
+                libRec[i].date = libRec[i].date.toDateString();
+            }
 		}
 		else
 		{
@@ -531,7 +548,8 @@ router.post("/generateReport",loggedinReport,(request,response)=>{
 			});*/
 			libRec=undefined;
 		}
-	});
+    });
+    console.log(libRec);
 
 	// FROM CURRENT PENDING ENTRY TABLE 
 	tmp_lib.aggregate(([
@@ -580,14 +598,17 @@ router.post("/generateReport",loggedinReport,(request,response)=>{
 			console.log(startDate, endDate);
 			if(result.length !== 0)
 			{
+                for(let i = 0;i<result.length;i++){
+                    result[i].date = result[i].date.toDateString();
+                }
 				setTimeout(()=>{
                     response.render("reportViews/DisplayLIBReport",
                     {
-                        title: "Generated Report From RC Reocrds",
+                        title: "Generated Report From RC Records",
                         tempRec: result,
                         libRec: libRec,
-                        startDate: startDate=='01-01-2000' ? 0 : startDate,
-                        endDate: endDate,
+                        startDate: startDate==fdate ? 0 : startDate.toDateString(),
+                        endDate: endDate.toDateString(),
                         id:endId
                     });
                 },1000);
@@ -598,11 +619,11 @@ router.post("/generateReport",loggedinReport,(request,response)=>{
 				setTimeout(()=>{
 				response.render("reportViews/DisplayLIBReport",
 				{
-					title: "Generated Report From Gate Reocrds",
+					title: "Generated Report From RC Records",
 					tempRec: null,
 					libRec: libRec,
-					startDate: startDate=='01-01-2000' ? 0 : startDate,
-                    endDate: endDate,
+					startDate: startDate==fdate ? 0 : startDate.toDateString(),
+                    endDate: endDate.toDateString(),
                     id:endId
                 });
             },1000);
