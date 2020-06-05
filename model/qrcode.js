@@ -68,8 +68,8 @@ var qr={
             var mailOptions={
                 from: process.env.mailID,
                 to:email_id,
-                subject:"Registration successful",
-                text:"Hello, \n\n You have successfully registered at DA-Scanner. Here is your QR code.\n\n You can regenerate 5 more QR codes by logging in to your profile. \n\n Contact Admin if 5 tries are done",
+                subject:"DA-Scanner QR code for "+id,
+                text:"Hello, \n\n You have just registered or regenerated your QR code. Here is your QR code.\n\n You can regenerate 5 more QR codes by logging in to your profile. \n\n Contact Admin if 5 tries are done",
                 //html: "Embedded image: <img src='cid:unique@kreata.ee' />",
                 attachments: [{
                     filename: qr_code_file_name,

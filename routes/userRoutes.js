@@ -232,6 +232,7 @@ userRouter.post('/forgotPass',(req,res,next)=>{
 				user: process.env.mailID,
 				pass: process.env.mailPassword			}
 		  });
+		  console.log("forgotpass");
 		  var mailOptions = {
 			to: user.userEmailId,
 			from: process.env.mailID,
@@ -301,11 +302,12 @@ userRouter.post("/changePassword",loggedin,(req,res) =>{
 		})
 		}
 	else{
-		//console.log("not");
+		console.log("not");
 		res.render("ChangePassword",{
 			msg: "",
 			error: "Old password Incorrect",
-			title: ""
+			title: "",
+			id: req.user.userTypeId
 		})
 	}
 	});

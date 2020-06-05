@@ -415,7 +415,6 @@ function CheckQR(id,status)
             
             <td><select required id="sel1" class="sel" name="equipmentID" onchange="v1()">
               
-                <option value="">Select equipment</option>
                 <% data.stock.forEach(equipment=>{%>
     
                         <option data-avl="<%= equipment.NumberOfAvailable %>" value="<%= equipment._id %>"><%= equipment.name %></option>
@@ -430,7 +429,7 @@ function CheckQR(id,status)
         <tr></tr>
         <tr>
             <td><label class="qty">Quantity: </label></td>
-            <td><input type="number" class="qty1" id="qty1"  value=1 onkeyup="validateForm();v2();" required name="quantity"></td>
+            <td><input type="number" class="qty1" id="qty1"  onkeyup="validateForm();v2();" required name="quantity" min="1"></td>
             
         </tr>
         <tr>

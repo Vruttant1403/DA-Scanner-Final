@@ -211,13 +211,12 @@ app.use("/student_header", student_header);
 app.use("/qrcode",qrcode);
 //app.user("/emp",userRoute);
 // init port so server can start listening
-
-/*app.use(function(req, res, next) {
+app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
-});*/
-/*
+});
+
 app.use(function(err,req,res,text){
 
     res.status(err.status || 500);
@@ -226,7 +225,7 @@ app.use(function(err,req,res,text){
     }else
     res.render("Errors/error500");
 
-})*/
+})
 
 
 app.listen(3000, ()=>
