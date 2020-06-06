@@ -46,7 +46,7 @@ var qr={
         console.log(dir);
         let qr_png=qrimg.imageSync(encryptedID,{ type: 'png'});
         let qr_code_file_name = id + '.png';
-        fs.writeFileSync(dir+'\\GeneratedQRCodes\\' + qr_code_file_name, qr_png,function(err)
+        fs.writeFileSync(dir+'/GeneratedQRCodes/' + qr_code_file_name, qr_png,function(err)
         {
             if(err)
             {
@@ -55,7 +55,7 @@ var qr={
         });
 
         let email_id=id+"@daiict.ac.in";
-        let img_src=dir+'\\GeneratedQRCodes\\'+qr_code_file_name;
+        let img_src=dir+'/GeneratedQRCodes/'+qr_code_file_name;
 
         
             var transporter=nodemailer.createTransport({
