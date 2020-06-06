@@ -219,7 +219,7 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-app.use(function(err,req,res,text){
+/*app.use(function(err,req,res,text){
 
     res.status(err.status || 500);
     if(err.status){
@@ -227,7 +227,7 @@ app.use(function(err,req,res,text){
     }else
     res.render("Errors/error500");
 
-})
+})*/
 
 const port = process.env.PORT || 3000;
 app.listen(port, ()=>

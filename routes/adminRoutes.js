@@ -49,7 +49,7 @@ var loggedin = function (req,res,next)
 }
 
 // ADD A COURSE TO THE DATABASE
-userRouter.post("/addCourse",(req,res) =>{
+userRouter.post("/addCourse",loggedin,(req,res) =>{
 
 	let cid = req.body.courseID;
 	let courseName = req.body.courseName;
@@ -91,7 +91,7 @@ userRouter.post("/addCourse",(req,res) =>{
 
 })
 
-userRouter.post("/updateCourse",function(req,res){
+userRouter.post("/updateCourse",loggedin,function(req,res){
 	let cid=req.body.id;
 	let course_name=req.body.coursename;
 	let course_duration=req.body.courseduration;
@@ -190,7 +190,7 @@ userRouter.post("/generateReport",loggedin,(request,response)=>{
 });
 
 //ADD Employee User Load
-userRouter.get("/addEmpUser", (request, response, next) =>
+userRouter.get("/addEmpUser",loggedin, (request, response, next) =>
 {
 	
 	UserTypes.find({}, (error, userTypes)=>
@@ -218,7 +218,7 @@ userRouter.get("/addEmpUser", (request, response, next) =>
 
 
 //ADD Employee User 
-userRouter.post("/addEmpUser", async (request, response, next) => 
+userRouter.post("/addEmpUser",loggedin, async (request, response, next) => 
 {
 		User.findOne({userEmailId:request.body.userEmailId},async (err,doc)=>{
 		if(err){
