@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
@@ -10,7 +11,7 @@ const flash = require("connect-flash");
 const crypto = require('crypto');
 const time1 = require('./timer');
 const uri = "mongodb+srv://Vruttant_1403:Mankad@dascanner-ou1qn.mongodb.net/dascanner?retryWrites=true&w=majority"
-require('dotenv').config();
+
 
 
 // connect to database
