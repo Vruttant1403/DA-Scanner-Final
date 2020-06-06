@@ -160,7 +160,7 @@ userRouter.get("/",loggedin,(req,res)=>{
 		}
 	})
 	setTimeout(()=>{
-        res.render("adminViews/adminHome",{
+        res.render("adminViews/AdminHome",{
 			title: user.fName + " " + user.lName,
 			avl_seats: libRecords,
 			inventoryData: inventoryRecords,
