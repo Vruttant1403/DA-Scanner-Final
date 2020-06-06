@@ -9,11 +9,12 @@ const cookieParser = require('cookie-parser');
 const flash = require("connect-flash");
 const crypto = require('crypto');
 const time1 = require('./timer');
+const uri = "mongodb+srv://Vruttant_1403:Mankad@dascanner-ou1qn.mongodb.net/dascanner?retryWrites=true&w=majority"
 require('dotenv').config();
 
 
 // connect to database
-mongoose.connect("mongodb://localhost/dascanner",
+mongoose.connect(uri ,
 { 
 	useNewUrlParser: true,
 	useUnifiedTopology: true 
@@ -144,7 +145,7 @@ app.get("/index",(request, response) =>
     }else{
     //response.redirect("/admin/loadAddUser");
     //console.log(msg + "heyyyyy");
-	response.render("loginPage",
+	response.render("AddUserType",
 	{
         title: "Helloo, Welcome to DAScanner.",
         error: msg

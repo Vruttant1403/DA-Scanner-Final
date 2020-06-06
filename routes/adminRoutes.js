@@ -14,7 +14,6 @@ const userRouter = express.Router();
 
 var loggedin = function (req,res,next)
 {
-    
     if(req.cookies['remember_me']){
         req.user = req.cookies['remember_me'];
     }
@@ -191,7 +190,7 @@ userRouter.post("/generateReport",loggedin,(request,response)=>{
 });
 
 //ADD Employee User Load
-userRouter.get("/addEmpUser",loggedin, (request, response, next) =>
+userRouter.get("/addEmpUser", (request, response, next) =>
 {
 	
 	UserTypes.find({}, (error, userTypes)=>
@@ -219,7 +218,7 @@ userRouter.get("/addEmpUser",loggedin, (request, response, next) =>
 
 
 //ADD Employee User 
-userRouter.post("/addEmpUser",loggedin, async (request, response, next) => 
+userRouter.post("/addEmpUser", async (request, response, next) => 
 {
 		User.findOne({userEmailId:request.body.userEmailId},async (err,doc)=>{
 		if(err){
