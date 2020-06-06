@@ -376,11 +376,13 @@ userRouter.get('/confirmUser/:token',(req,res)=>{
 		})
 		
 	})
-	userTemp.deleteOne({resetPasswordToken: toDel},(err)=>{
-		if(err){
-			console.log(err);
-		}
-	});
+	setTimeout(()=>{
+		userTemp.deleteOne({resetPasswordToken: toDel},(err)=>{
+			if(err){
+				console.log(err);
+			}
+		});
+	},2000) 
 	
 })
 
