@@ -343,6 +343,11 @@ router.post("/return/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
             else{
                
                 let tot_qty = rows[0].quantity;
+                // CHECKING IF RETURNING MORE THAN BORROWED
+                if(tot_qty < parseInt(req.params.quantity)){
+                    res.status(500).send("You have issued only " + tot_qty);
+                }
+
                 let issued_date = rows[0].issue_date;
                 issued_date = new Date(issued_date);
                 let today = new Date();
@@ -376,7 +381,7 @@ router.post("/return/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
                             if(err)
                                 res.json(err);
                                 else{
-                                    if(tot_qty-req.params.quantity<=0)
+                                    if(tot_qty-parseInt(req.params.quantity)==0)
                                     {
                                     equipment.deleteOne({ student_id: req.params.studentID, equipment_id: req.params.equipmentID }, function (err, result) {
                                     if (err) {
@@ -393,7 +398,7 @@ router.post("/return/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
                                 });
                             }
                             else{
-                                equipment.updateOne({ student_id: req.params.studentID, equipment_id: req.params.equipmentID },{$inc:{quantity:-req.params.quantity}},function(err,rows){
+                                equipment.updateOne({ student_id: req.params.studentID, equipment_id: req.params.equipmentID },{$set:{quantity:tot_qty-req.params.quantity}},function(err,rows){
                                     if(err)
                                     {
                                         res.json(err);

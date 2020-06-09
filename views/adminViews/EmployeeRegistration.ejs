@@ -42,13 +42,13 @@
 					<br/>
 					<div class="form-group row" style="margin-left: 10px;">
 							<label for="Email ID" class="col-sm-2 col-form-label">Email ID</label> 
-							<input class="form-control col-sm-4" type="text" placeholder="Email" name="userEmailId" id="emailId"   value="<%=email%>" required>
+							<input class="form-control col-sm-4" type="email" placeholder="Email" name="userEmailId" id="emailId"   value="<%=email%>" required>
 					</div>
 					<span id="error-Email" style="color:red;"></span>   
 					<br/>
 					<div class="form-group row" style="margin-left: 10px;">
 						<label for="Employee ID" class="col-sm-2 col-form-label">Employee ID</label> 
-							 <input class="form-control col-sm-4" type="text" placeholder="Employee ID Number"  maxlength="9"  name="userId" id="stuID"  value="<%=stuID%>" required>
+							 <input class="form-control col-sm-4" type="number" placeholder="Employee ID Number"  maxlength="9" min="200000000" name="userId" id="stuID"  value="<%=stuID%>" required>
 					</div>
 					<span id="error-ID" style="color:red;"></span>
 					<br/>
