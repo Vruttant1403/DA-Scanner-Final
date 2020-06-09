@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser');
 const flash = require("connect-flash");
 const crypto = require('crypto');
 const time1 = require('./timer');
-const uri = "mongodb+srv://Vruttant_1403:Mankad@dascanner-ou1qn.mongodb.net/dascanner?retryWrites=true&w=majority"
+const uri = process.env.MONGO_URI;
 
 
 
