@@ -303,8 +303,8 @@ router.post("/issue/:equipmentID?/:studentID?/:quantity?",loggedin,(req,res)=>{
                 const equi = new equipment({
                     equipment_id: req.params.equipmentID,
                     student_id: req.params.studentID,
-                    issue_date: date.format(x, 'YYYY-MM-DD'),
-                    quantity: req.params.quantity
+                    issue_date: x,
+                    quantity: parseInt(req.params.quantity)
 
 
                 });
